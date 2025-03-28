@@ -89,8 +89,8 @@ async fn execute_query() -> Result<String, sqlx::Error> {
 
     let mut result = String::new();
     for row in reply {
-        let text: String = row.get(1);  // La colonna "Text" è ora la seconda
-        let id: i8 = row.get(0);        // La colonna "ID" è la prima
+        let text: String = row.get(1);
+        let id: i8 = row.get(0);
         result.push_str(&format!("ID {}: {}\n", id, text));
     }
 
