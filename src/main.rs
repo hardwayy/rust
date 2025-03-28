@@ -63,7 +63,7 @@ impl eframe::App for MyApp {
                                 *text = format!("Errore: {}", e);
                             }
                         }
-                        ctx.request_repaint(); /
+                        ctx.request_repaint();
                     });
                 }
 
@@ -82,15 +82,16 @@ async fn execute_query() -> Result<String, sqlx::Error> {
         .connect(db_url)
         .await?;
 
-    // Esegui la query SQL
-    let reply = sqlx::query("SELECT Text FROM ttable")
+    // Esegui la query SQL per selezionare sia ID che Text
+    let reply = sqlx::query("SELECT TextID, Text FROM ttable")
         .fetch_all(&pool)
         .await?;
 
     let mut result = String::new();
     for row in reply {
-        let text: String = row.get(0);
-        result.push_str(&format!("Result: {}\n", text));
+        let text: String = row.get(1);  // La colonna "Text" è ora la seconda
+        let id: i8 = row.get(0);        // La colonna "ID" è la prima
+        result.push_str(&format!("ID {}: {}\n", id, text));
     }
 
     Ok(result)
