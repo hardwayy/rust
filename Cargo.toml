@@ -11,5 +11,5 @@ env_logger = { version = "0.10", default-features = false, features = [
 ] }
 eframe = "0.31.1"
 sqlx = { version = "0.8", features = [ "runtime-tokio-native-tls", "tls-native-tls","mysql" ] }
-async-std = "1.13.1"
 tokio = { version = "1.44.1", features = ["rt", "rt-multi-thread", "macros"] }
+dotenv = "0.15.0"

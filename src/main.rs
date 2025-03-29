@@ -1,17 +1,19 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 #![allow(rustdoc::missing_crate_level_docs)] // it's an example
 
+use std::env;
 use egui::{CentralPanel};
 use tokio;
-use sqlx::{Pool, mysql, mysql::MySql, Row};
+use sqlx::{Pool, mysql::MySql, Row};
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::{Arc, Mutex};
+use dotenv::dotenv;
 
 #[tokio::main]
 async fn main() -> Result<(), eframe::Error> {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
     let options = eframe::NativeOptions::default();
-    eframe::run_native("Popups", options, Box::new(|_| Ok(Box::<MyApp>::default())))
+    eframe::run_native("Queries", options, Box::new(|_| Ok(Box::<MyApp>::default())))
 }
 
 #[derive(Default)]
@@ -24,23 +26,15 @@ struct MyApp {
 }
 
 impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &eframe::egui::Context, _frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         use egui::CentralPanel;
 
         CentralPanel::default().show(ctx, |ui| {
             ui.vertical_centered(|ui| {
-                ui.heading("My App");
+                ui.heading("Db query");
             });
 
-            ui.horizontal(|ui| {
-                ui.label("This is a column");
-                ui.add(egui::Checkbox::new(&mut self.checkbox, ""));
 
-                ui.label("This is another column");
-                ui.add(egui::DragValue::new(&mut self.number));
-                ui.label("This is another column");
-                ui.add(egui::Slider::new(&mut self.number, 0.0..=100.0));
-            });
 
             ui.vertical_centered(|ui| {
                 let qbutton = ui.button("Query");
@@ -75,11 +69,13 @@ impl eframe::App for MyApp {
 }
 
 async fn execute_query() -> Result<String, sqlx::Error> {
-    let db_url = "mysql://rust:111@trisworkshop.vps.webdock.cloud/trisworkshop";
+    dotenv().ok();
+
+    let db_url =  env::var("DATABASE_URL").expect("DATABASE_URL non trovato");
 
     let pool: Pool<MySql> = MySqlPoolOptions::new()
         .max_connections(5)
-        .connect(db_url)
+        .connect(&db_url)
         .await?;
 
     // Esegui la query SQL per selezionare sia ID che Text
